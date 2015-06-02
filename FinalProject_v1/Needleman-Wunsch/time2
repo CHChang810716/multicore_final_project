@@ -1,0 +1,12 @@
+Start Needleman-Wunsch
+Processing top-left matrix
+Processing bottom-right matrix
+s_time.tv_sec:1433095458, s_time.tv_nsec:687711541
+e_time.tv_sec:1433095464, e_time.tv_nsec:632841083
+[diff_time:5.945129542 sec]
+Start Needleman-Wunsch
+Processing top-left matrix
+Processing bottom-right matrix
+s_time.tv_sec:1433095464, s_time.tv_nsec:639628298
+e_time.tv_sec:1433095493, e_time.tv_nsec:880858554
+[diff_time:29.241230256 sec]
