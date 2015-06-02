@@ -1,0 +1,55 @@
+#!/bin/bash
+ #===============================================================================
+ #
+ #          FILE:  ST_Mapper_s2_output 
+ #
+ #         USAGE:  ---
+ #
+ #   DESCRIPTION:  ---
+ #
+ #       OPTIONS:  ---
+ #  REQUIREMENTS:  ---
+ #          BUGS:  ---
+ #         NOTES:  ---
+ #        AUTHOR:  IC (Yin-Chi Peng), <psycsieic@gmail.com>
+ #       COMPANY:  ---
+ #       VERSION:  1.0
+ #       CREATED:  2015-05-11 16:40:27
+ #      REVISION:  ---
+ #      MODIFIED:
+ #
+ #===============================================================================
+
+
+STREAMJAR=/usr/local/hadoop/share/hadoop/tools/lib/hadoop-streaming-2.2.0.jar
+INPUT=/reducer_s1_output
+Small_Test_Input=./reducer_s1_output
+OUTPUT=mapper_s2_output
+OUTPUT_DIRECTORY=result
+
+MAPPER=mapper_s2
+#REDUCER=cat
+
+if [ $# -eq 1 ]
+then
+
+hadoop fs -rm $INPUT
+
+hadoop fs -put $Small_Test_Input /
+
+hadoop fs -rm -r -f $OUTPUT_DIRECTORY
+#hadoop jar $STREAMJAR  -mapper cat -reducer cat -input $INPUT -output $OUTPUT_DIRECTORY \
+hadoop jar $STREAMJAR -files $MAPPER,$REDUCER \
+           -D stream.map.output.field.separator='\t' \
+           -D stream.num.map.output.key.field=2 \
+           -D num.key.fields.for.partition=1 \
+           -D map.output.key.field.separator='\t' \
+           -mapper "$MAPPER $1" \
+           -reducer cat \
+           -input $INPUT \
+           -output $OUTPUT_DIRECTORY
+hadoop fs -cat $OUTPUT_DIRECTORY/part* > $OUTPUT
+
+else
+echo "./ST_Mapper_s2_output [search_target]"
+fi 

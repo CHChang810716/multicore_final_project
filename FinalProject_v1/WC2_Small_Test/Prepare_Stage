@@ -1,0 +1,25 @@
+#!/bin/bash
+ #===============================================================================
+ #
+ #          FILE:  Prepare_Stage 
+ #
+ #         USAGE:  ---
+ #
+ #   DESCRIPTION:  ---
+ #
+ #       OPTIONS:  ---
+ #  REQUIREMENTS:  ---
+ #          BUGS:  ---
+ #         NOTES:  ---
+ #        AUTHOR:  IC (Yin-Chi Peng), <psycsieic@gmail.com>
+ #       COMPANY:  ---
+ #       VERSION:  1.0
+ #       CREATED:  2015-05-11 16:40:27
+ #      REVISION:  ---
+ #      MODIFIED:
+ #
+ #===============================================================================
+chmod 755 ST_Mapper_s1_output ST_Reducer_s1_output ST_Mapper_s2_output ST_Reducer_s2_output
+
+ln -s ST_Reducer_s1_output ./MapReduce_Stage1
+ln -s ST_Reducer_s2_output ./MapReduce_Stage2 
