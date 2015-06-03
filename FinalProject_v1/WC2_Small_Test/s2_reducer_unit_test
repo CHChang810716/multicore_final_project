@@ -40,6 +40,12 @@ hadoop fs -put $Small_Test_Input /
 
 hadoop fs -rm -r -f $OUTPUT_DIRECTORY
 hadoop jar $STREAMJAR -files $REDUCER \
+           -D mapred.output.key.comparator.class=org.apache.hadoop.mapred.lib.KeyFieldBasedComparator \
+           -D mapred.text.key.comparator.options=-k1,1nr \
+           -D stream.map.output.field.separator='\t' \
+           -D stream.num.map.output.key.field=3 \
+           -D num.key.fields.for.partition=1 \
+           -D map.output.key.field.separator='\t' \
            -mapper $MAPPER \
            -reducer $REDUCER \
            -input $INPUT \
