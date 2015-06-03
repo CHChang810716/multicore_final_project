@@ -28,27 +28,26 @@ OUTPUT=mapper_s2_output
 OUTPUT_DIRECTORY=result
 
 MAPPER=mapper_s2
-#REDUCER=cat
 
 if [ $# -eq 1 ]
 then
 
-hadoop fs -rm $INPUT
+    hadoop fs -rm $INPUT
 
-hadoop fs -put $Small_Test_Input /
+    hadoop fs -put $Small_Test_Input /
 
-hadoop fs -rm -r -f $OUTPUT_DIRECTORY
-hadoop jar $STREAMJAR -files $MAPPER,$REDUCER \
-           -D stream.map.output.field.separator='\t' \
-           -D stream.num.map.output.key.field=2 \
-           -D num.key.fields.for.partition=1 \
-           -D map.output.key.field.separator='\t' \
-           -mapper "$MAPPER $1" \
-           -reducer cat \
-           -input $INPUT \
-           -output $OUTPUT_DIRECTORY
-hadoop fs -cat $OUTPUT_DIRECTORY/part* > $OUTPUT
+    hadoop fs -rm -r -f $OUTPUT_DIRECTORY
+    hadoop jar $STREAMJAR -files $MAPPER \
+        -D stream.map.output.field.separator='\t' \
+        -D stream.num.map.output.key.field=2 \
+        -D num.key.fields.for.partition=1 \
+        -D map.output.key.field.separator='\t' \
+        -mapper "$MAPPER $1" \
+        -reducer cat \
+        -input $INPUT \
+        -output $OUTPUT_DIRECTORY
+    hadoop fs -cat $OUTPUT_DIRECTORY/part* > $OUTPUT
 
 else
-echo "./ST_Mapper_s2_output [search_target]"
+    echo "./s2_mapper_unit_test [search_target]"
 fi 
