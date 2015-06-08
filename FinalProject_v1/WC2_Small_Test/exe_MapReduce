@@ -1,0 +1,4 @@
+#!/bin/bash
+./MapReduce_Stage1
+./MapReduce_Stage2 $1
+
