@@ -5,23 +5,9 @@
 #include <math.h>
 #include <sys/time.h>
 #include <time.h>
-#include <pthread.h>
 
 struct timespec start_time;
 struct timespec end_time;
-struct WorkerArgs_t
-{
-    int* input_itemsets;
-    int index;
-    int max_cols;
-    int penalty;
-    int start;
-    int end;
-    int i;
-    int* referrence;
-};
-typedef WorkerArgs_t WorkerArgs;
-
 
 ////////////////////////////////////////////////////////////////////////////////
 // declaration, forward
@@ -94,41 +80,6 @@ void usage(int argc, char **argv)
 	fprintf(stderr, "\t<penalty>        - penalty(positive integer)\n");
 	exit(1);
 }
-void top_left(int start, int end, int* input_itemsets, int index, int max_cols, int penalty, int i, int* referrence)
-{
-    int idx;
-    for( idx = start ; idx <= end ; idx++){
-        index = (idx + 1) * max_cols + (i + 1 - idx);
-        input_itemsets[index]= maximum( input_itemsets[index-1-max_cols]+ referrence[index], 
-                input_itemsets[index-1]         - penalty, 
-                input_itemsets[index-max_cols]  - penalty);
-
-    }
-}
-void* worker1(void* args)
-{
-    WorkerArgs* wargs((WorkerArgs*)args); 
-    top_left( wargs->start, wargs->end, wargs->input_itemsets, wargs->index, wargs->max_cols, wargs->penalty, wargs->i, wargs->referrence);
-    free(wargs);
-    return NULL;
-}
-void buttom_right(int start, int end, int* input_itemsets, int index, int max_cols, int penalty, int i, int* referrence)
-{
-    int idx;
-    for( idx = start ; idx <= end ; idx++){
-        index =  ( max_cols - idx - 2 ) * max_cols + idx + max_cols - i - 2 ;
-        input_itemsets[index]= maximum( input_itemsets[index-1-max_cols]+ referrence[index], 
-                input_itemsets[index-1]         - penalty, 
-                input_itemsets[index-max_cols]  - penalty);
-    }
-}
-void* worker2(void* args)
-{
-    WorkerArgs* wargs((WorkerArgs*)args); 
-    buttom_right( wargs->start, wargs->end, wargs->input_itemsets, wargs->index, wargs->max_cols, wargs->penalty, wargs->i, wargs->referrence);
-    free(wargs);
-    return NULL;
-}
 
 ////////////////////////////////////////////////////////////////////////////////
 //! Run a simple test 
@@ -196,72 +147,28 @@ runTest( int argc, char** argv)
        input_itemsets[j] = -j * penalty;
 
 
-	const int thread_num(5);
-    pthread_t threadset[thread_num];	
+	
 	//Compute top-left matrix 
 	printf("Processing top-left matrix\n");
+	
     for( int i = 0 ; i < max_cols-2 ; i++){
-        int load (i/thread_num);
-        int remain(i%thread_num);
-        int j, start, end = 0;
-        for (j = 0; j < thread_num; j++, remain--) {
-            start = end;
-            end = start + load + ( remain > 0 );
-            WorkerArgs* wargs = (WorkerArgs*)malloc(sizeof(WorkerArgs));
-            wargs -> start = start;
-            wargs -> end = end;
-            wargs -> input_itemsets = input_itemsets;
-            wargs -> index = index;
-            wargs -> max_cols = max_cols;
-            wargs -> penalty = penalty;
-            wargs -> referrence = referrence;
-            wargs -> i = i;
-            pthread_create(threadset + j, NULL, &worker1, wargs);
-
-        }
-        for (j = 0; j < thread_num; j++ ) {
-            pthread_join(threadset[j], NULL);
-        }
-        
-		/*for( idx = 0 ; idx <= i ; idx++){
+		for( idx = 0 ; idx <= i ; idx++){
 		 index = (idx + 1) * max_cols + (i + 1 - idx);
          input_itemsets[index]= maximum( input_itemsets[index-1-max_cols]+ referrence[index], 
 			                             input_itemsets[index-1]         - penalty, 
 									     input_itemsets[index-max_cols]  - penalty);
 
-		}*/
-
+		}
 	}
 	printf("Processing bottom-right matrix\n");
     //Compute bottom-right matrix 
 	for( int i = max_cols - 4 ; i >= 0 ; i--){
-        int load (i/thread_num);
-        int remain(i%thread_num);
-        int j, start, end = 0;
-        for (j = 0; j < thread_num; j++, remain--) {
-            start = end;
-            end = start + load + ( remain > 0 );
-            WorkerArgs* wargs = (WorkerArgs*)malloc(sizeof(WorkerArgs));
-            wargs -> start = start;
-            wargs -> end = end;
-            wargs -> input_itemsets = input_itemsets;
-            wargs -> index = index;
-            wargs -> max_cols = max_cols;
-            wargs -> penalty = penalty;
-            wargs -> referrence = referrence;
-            wargs -> i = i;
-            pthread_create(threadset + j, NULL, &worker2, wargs);
-
-        }
-        for (j = 0; j < thread_num; j++ ) {
-            pthread_join(threadset[j], NULL);
-        }
-//       for( idx = 0 ; idx <= i ; idx++){
-//	      index =  ( max_cols - idx - 2 ) * max_cols + idx + max_cols - i - 2 ;
-//		  input_itemsets[index]= maximum( input_itemsets[index-1-max_cols]+ referrence[index], 
-//			                              input_itemsets[index-1]         - penalty, 
-//									      input_itemsets[index-max_cols]  - penalty);
-//	      }
+       for( idx = 0 ; idx <= i ; idx++){
+	      index =  ( max_cols - idx - 2 ) * max_cols + idx + max_cols - i - 2 ;
+		  input_itemsets[index]= maximum( input_itemsets[index-1-max_cols]+ referrence[index], 
+			                              input_itemsets[index-1]         - penalty, 
+									      input_itemsets[index-max_cols]  - penalty);
+	      }
 
 	}
 
